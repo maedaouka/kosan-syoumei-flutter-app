@@ -115,10 +115,15 @@
 //     );
 //   }
 // }
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:developer';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -162,10 +167,11 @@ class _AuthPageState extends State {
 
   bool logined = false;
 
-  void login() {
+  void login(FirebaseUser user) {
     setState(() {
       logined = true;
     });
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(user)));
   }
 
   void logout() {
@@ -196,7 +202,7 @@ class _AuthPageState extends State {
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
 
-    login();
+    login(user);
   }
 
   void signOutTwitter() async {
@@ -234,6 +240,296 @@ class _AuthPageState extends State {
           children: [
             logined ? loginText : logoutText,
             logined ? logoutBtnTwitter : loginBtnTwitter,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+class MyHomePage extends StatefulWidget {
+
+  @override
+  _MyHomePageState createState() => new _MyHomePageState();
+
+  MyHomePage(FirebaseUser user) {
+    _MyHomePageState.user = user;
+  }
+
+}
+
+
+class _MyHomePageState extends State<MyHomePage> {
+  static FirebaseUser user;
+  static List<dynamic> certificateList = [];
+  static List<dynamic> fromNameList = [];
+  static List<dynamic> toNameList = [];
+  static List<dynamic> memoList = [];
+
+
+  List<String> itemList = [];
+  void buildItemList()async{
+    var response = await fetchArticle();
+    for (int j = 0; j < response.data["items"].length; j++) {
+      setState(() {
+        itemList.add(response.data["items"][j]);
+      });
+    }
+  }
+
+  Future fetchArticle() async {
+
+    log(user.providerData[1].uid);
+    var deviceId = user.providerData[1].uid;
+    log("async");
+
+    final url = "http://10.0.2.2:8000/mylist?device=$deviceId";
+    // final url = "https://myj3b4uiw9.execute-api.ap-northeast-1.amazonaws.com/default/kosan_syoumei_mylist?device='$deviceId'";
+
+    log(url);
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        certificateList = json.decode(response.body)["to_name_list"];
+        fromNameList = json.decode(response.body)["from_name_list"];
+        toNameList = json.decode(response.body)["to_name_list"];
+        memoList = json.decode(response.body)["memo_list"];
+
+      });
+      // certificateList = json.decode(response.body)["person_list"];
+      log("api");
+      log(certificateList.length.toString());
+      // streamController.sink.add(certificateList[0]);
+
+
+
+      return certificateList;
+    } else {
+      log("else");
+      throw Exception('Failed to load article');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // streamController.stream.listen((addData) {
+    //   log(addData);
+    // });
+    // log("init end");
+    // streamController.sink.add("DIO");
+    // streamController.sink.add("承太郎");
+    fetchArticle();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    // List<dynamic> jsonArray = [];
+
+    // fetchArticle() async {
+    //   log("async");
+    //
+    //   final url = 'https://qiita.com/api/v2/items';
+    //   final response = await http.get(url);
+    //   if (response.statusCode == 200) {
+    //     jsonArray = json.decode(response.body);
+    //     // log(json.decode(response.body));
+    //     log("api");
+    //     log(jsonArray.length.toString());
+    //
+    //     return jsonArray;
+    //   } else {
+    //     log("else");
+    //     throw Exception('Failed to load article');
+    //   }
+    // }
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("古参証明書　一覧"),
+      ),
+      body: ListView(children: List.generate(certificateList.length, (index) {
+        log("a");
+        return InkWell(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateDetail(index, fromNameList[index], toNameList[index], memoList[index])));
+          },
+          child: Card(
+            child: Column(
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.all(10.0),
+                    child: ListTile(
+                      title: Text(certificateList[index]),
+                      leading: Image.asset("assets/image_sample.png"),
+                      subtitle: Text("2018年9月26日発行"),
+                    )
+                )
+              ],
+            ),
+          ),
+        );
+      })
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateCreate(user)));
+        },
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+
+class MyCertificateDetail extends StatefulWidget {
+  @override
+  _MyCertificateDetailState createState() => new _MyCertificateDetailState();
+
+  MyCertificateDetail(int id, String fromName, String toName, String memo) {
+    _MyCertificateDetailState.i = id;
+    _MyCertificateDetailState.fromName = fromName;
+    _MyCertificateDetailState.toName = toName;
+    _MyCertificateDetailState.memo = memo;
+
+  }
+}
+
+class _MyCertificateDetailState extends State<MyCertificateDetail> {
+  static int i = 0;
+  static String fromName = "";
+  static String toName = "";
+  static String memo = "";
+
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text("古参証明書"),
+        ),
+        body: Center(
+          child: Text("古参証明書　10月10日発行 \n\n $fromNameは$toNameを応援していることをここに証明します。\n\n「$memo」"),
+        )
+    );
+  }
+}
+
+class CreateCertificatePage extends StatefulWidget {
+  @override
+  _CreateCertificatePageState createState() => new _CreateCertificatePageState();
+}
+
+class _CreateCertificatePageState extends State<CreateCertificatePage> {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text("古参証明書"),
+        ),
+        body: Center(
+          child: Text("古参証明書作成ページです。"),
+        )
+    );
+  }
+}
+
+class MyCertificateCreate extends StatefulWidget {
+
+  @override
+  _MyCertificateCreateState createState() => new _MyCertificateCreateState();
+
+  MyCertificateCreate(FirebaseUser user) {
+    _MyCertificateCreateState.user = user;
+    _MyCertificateCreateState._deviceId = user.providerData[1].uid;
+    _MyCertificateCreateState._fromName = user.providerData[1].displayName;
+  }
+}
+
+class _MyCertificateCreateState extends State<MyCertificateCreate> {
+  static FirebaseUser user;
+  static String str = "a";
+  static String _memo = "";
+  static String _fromName = "";
+  static String _toName = "";
+  static String _deviceId = "";
+
+  void _handleMemo(String e) {
+    setState(() {
+      _memo = e;
+    });
+  }
+
+  void _handleFromName(String e) {
+    setState(() {
+      _fromName = e;
+    });
+  }
+
+  void _handleToName(String e) {
+    setState(() {
+      _toName = e;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("古参証明書　作成"),
+      ),
+      // body: Center(
+      //   child: Text("古参証明書作成ページ$str")
+      // )
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Text("古参証明書作成ページ$str"),
+            Text("相手の名前"),
+            new TextField(
+              enabled: true,
+              // 入力数
+              maxLength: 10,
+              maxLengthEnforced: false,
+              style: TextStyle(color: Colors.red),
+              obscureText: false,
+              maxLines: 1,
+              //パスワード
+              onChanged: _handleToName,
+            ),
+            Text("メモ"),
+            new TextField(
+              enabled: true,
+              // 入力数
+              maxLength: 10,
+              maxLengthEnforced: false,
+              style: TextStyle(color: Colors.red),
+              obscureText: false,
+              maxLines: 1,
+              //パスワード
+              onChanged: _handleMemo,
+            ),
+            RaisedButton(
+              child: Text("証明書を発行する"),
+              color: Colors.yellow,
+              shape: BeveledRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              onPressed: () {
+                Future createCertificate() async {
+                  // TODO: デバイスIDをツイッターID(ユニークな方)に変える
+                  final url = "http://10.0.2.2:8000/create?device=$_deviceId&from_name=$_fromName&to_name=$_toName&memo=$_memo";
+
+                  await http.get(url);
+                }
+                createCertificate();
+              },
+            ),
           ],
         ),
       ),
