@@ -124,6 +124,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:developer';
 import 'dart:async';
+import 'package:twitter_api/twitter_api.dart';
 
 void main() => runApp(MyApp());
 
@@ -167,11 +168,11 @@ class _AuthPageState extends State {
 
   bool logined = false;
 
-  void login(FirebaseUser user) {
+  void login(FirebaseUser user, String token, String secret) {
     setState(() {
       logined = true;
     });
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(user)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(user, token, secret)));
   }
 
   void logout() {
@@ -202,7 +203,7 @@ class _AuthPageState extends State {
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
 
-    login(user);
+    login(user, result.session.token, result.session.secret);
   }
 
   void signOutTwitter() async {
@@ -254,8 +255,10 @@ class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => new _MyHomePageState();
 
-  MyHomePage(FirebaseUser user) {
+  MyHomePage(FirebaseUser user, String token, String secret) {
     _MyHomePageState.user = user;
+    _MyHomePageState.token = token;
+    _MyHomePageState.secret = secret;
   }
 
 }
@@ -263,6 +266,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static FirebaseUser user;
+  static String token;
+  static String secret;
   static List<dynamic> certificateList = [];
   static List<dynamic> fromNameList = [];
   static List<dynamic> toNameList = [];
@@ -285,8 +290,8 @@ class _MyHomePageState extends State<MyHomePage> {
     var deviceId = user.providerData[1].uid;
     log("async");
 
-    final url = "http://10.0.2.2:8000/mylist?device=$deviceId";
-    // final url = "https://myj3b4uiw9.execute-api.ap-northeast-1.amazonaws.com/default/kosan_syoumei_mylist?device='$deviceId'";
+    // final url = "http://10.0.2.2:8000/mylist?device=$deviceId";
+    final url = "https://22161mw9kg.execute-api.ap-northeast-1.amazonaws.com/kosan_syoumei_mylist?device=$deviceId";
 
     log(url);
     final response = await http.get(url);
@@ -299,11 +304,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       });
       // certificateList = json.decode(response.body)["person_list"];
-      log("api");
-      log(certificateList.length.toString());
-      // streamController.sink.add(certificateList[0]);
-
-
 
       return certificateList;
     } else {
@@ -365,7 +365,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: EdgeInsets.all(10.0),
                     child: ListTile(
                       title: Text(certificateList[index]),
-                      leading: Image.asset("assets/image_sample.png"),
+                      // leading: Image.asset("assets/image_sample.png"),
+                      leading: Icon(Icons.people),
                       subtitle: Text("2018年9月26日発行"),
                     )
                 )
@@ -377,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateCreate(user)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateCreate(user, token, secret)));
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -444,8 +445,11 @@ class MyCertificateCreate extends StatefulWidget {
   @override
   _MyCertificateCreateState createState() => new _MyCertificateCreateState();
 
-  MyCertificateCreate(FirebaseUser user) {
+  MyCertificateCreate(FirebaseUser user, String token, String secret) {
     _MyCertificateCreateState.user = user;
+    _MyCertificateCreateState.token = token;
+    _MyCertificateCreateState.secret = secret;
+
     _MyCertificateCreateState._deviceId = user.providerData[1].uid;
     _MyCertificateCreateState._fromName = user.providerData[1].displayName;
   }
@@ -453,7 +457,8 @@ class MyCertificateCreate extends StatefulWidget {
 
 class _MyCertificateCreateState extends State<MyCertificateCreate> {
   static FirebaseUser user;
-  static String str = "a";
+  static String token;
+  static String secret;
   static String _memo = "";
   static String _fromName = "";
   static String _toName = "";
@@ -477,19 +482,54 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
     });
   }
 
+  Future twitterUserShow(String token, String secret, String screen_name) async {
+
+    print(screen_name);
+
+    String consumerApiKey = "IoJiMkAVEmjjkQoIExzAn69xE";
+    String consumerApiSecret = "ZCa3waPjr9HM5xHDgSDcLjiGqy6jBeQ6DlVyAa5uOkDG09bLOU";
+    String accessToken = token;
+    String accessTokenSecret = secret;
+
+    final _twitterOauth = new twitterApi(
+        consumerKey: consumerApiKey,
+        consumerSecret: consumerApiSecret,
+        token: accessToken,
+        tokenSecret: accessTokenSecret
+    );
+
+    Future twitterRequest = _twitterOauth.getTwitterRequest(
+      // Http Method
+      "GET",
+      // Endpoint you are trying to reach
+      "users/show.json",
+      // The options for the request
+      options: {
+        "screen_name": screen_name,
+      },
+    );
+
+    var res = await twitterRequest;
+
+    print(res.statusCode);
+    print(res.body);
+
+    // Convert the string response into something more useable
+    var resJson = json.decode(res.body);
+
+    return(resJson["id_str"]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("古参証明書　作成"),
       ),
-      // body: Center(
-      //   child: Text("古参証明書作成ページ$str")
-      // )
       body: Center(
         child: Column(
           children: <Widget>[
-            Text("古参証明書作成ページ$str"),
+            Text("古参証明書作成ページ"),
             Text("相手の名前"),
             new TextField(
               enabled: true,
@@ -522,12 +562,15 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
               ),
               onPressed: () {
                 Future createCertificate() async {
-                  // TODO: デバイスIDをツイッターID(ユニークな方)に変える
-                  final url = "http://10.0.2.2:8000/create?device=$_deviceId&from_name=$_fromName&to_name=$_toName&memo=$_memo";
+
+                  _toName = await twitterUserShow(token, secret, _toName);
+
+                  final url = "https://eca9kh6oqe.execute-api.ap-northeast-1.amazonaws.com/default/kosan_syoumei_create?device=$_deviceId&from_name=$_fromName&to_name=$_toName&memo=$_memo";
 
                   await http.get(url);
                 }
                 createCertificate();
+                Navigator.of(context).pop();
               },
             ),
           ],
