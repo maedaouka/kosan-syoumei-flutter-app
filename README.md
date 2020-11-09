@@ -14,3 +14,13 @@ firebaseを利用してtwitter認証でログイン
 　　　　　↓
 
 AWSのAPIGateway　→　AWSのlambda →　QLDBアクセス
+
+
+## 構成
+flutterAppのインストール
+https://flutter.dev/docs/get-started/install
+
+パッケージがプロジェクトに取り込む
+```
+flutter pub get
+```
