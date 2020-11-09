@@ -7,10 +7,10 @@ twitterのユーザーUIDとAWSのQLDBを利用した、古参であることを
 
 firebaseを利用してtwitter認証でログイン
 
-　　　　　　↓
+          ↓
 
 ログイン時に取得した情報からtwitterAPIを叩く。（応援相手を入力する際にAPIを叩いてユーザー情報を取得しています。）
 
-  　　　　　↓
+          ↓
 
 AWSのAPIGateway　→　AWSのlambda →　QLDBアクセス
