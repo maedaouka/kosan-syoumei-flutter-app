@@ -5,7 +5,7 @@ twitterのユーザーUIDとAWSのQLDBを利用した、古参であることを
 
 ## 構成
 
-firebaseを利用してtwitter認証でログイン
+firebaseを利用してtwitter認証でログイン¥n
 　　　　　　↓
 ログイン時に取得した情報からtwitterAPIを叩く。（応援相手を入力する際にAPIを叩いてユーザー情報を取得しています。）
 　　　　　　↓
