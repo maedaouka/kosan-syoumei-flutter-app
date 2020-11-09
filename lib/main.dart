@@ -160,7 +160,6 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // APIキーを入力
   final TwitterLogin twitterLogin = TwitterLogin(
     consumerKey: "IoJiMkAVEmjjkQoIExzAn69xE",
     consumerSecret: "ZCa3waPjr9HM5xHDgSDcLjiGqy6jBeQ6DlVyAa5uOkDG09bLOU",
@@ -190,7 +189,6 @@ class _AuthPageState extends State {
       authToken: result.session.token,
       authTokenSecret: result.session.secret,
     );
-
 
     //Firebaseのuser id取得
     final FirebaseUser user =
@@ -233,7 +231,7 @@ class _AuthPageState extends State {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("widget.title"),
+        title: Text("古参証明"),
       ),
       body: Center(
         child: Column(
@@ -248,8 +246,6 @@ class _AuthPageState extends State {
   }
 }
 
-
-
 class MyHomePage extends StatefulWidget {
 
   @override
@@ -260,9 +256,7 @@ class MyHomePage extends StatefulWidget {
     _MyHomePageState.token = token;
     _MyHomePageState.secret = secret;
   }
-
 }
-
 
 class _MyHomePageState extends State<MyHomePage> {
   static FirebaseUser user;
@@ -272,7 +266,10 @@ class _MyHomePageState extends State<MyHomePage> {
   static List<dynamic> fromNameList = [];
   static List<dynamic> toNameList = [];
   static List<dynamic> memoList = [];
+  static List<dynamic> dobList = [];
 
+
+  var deviceId = user.providerData[1].uid;
 
   List<String> itemList = [];
   void buildItemList()async{
@@ -286,14 +283,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future fetchArticle() async {
 
-    log(user.providerData[1].uid);
-    var deviceId = user.providerData[1].uid;
-    log("async");
-
-    // final url = "http://10.0.2.2:8000/mylist?device=$deviceId";
     final url = "https://22161mw9kg.execute-api.ap-northeast-1.amazonaws.com/kosan_syoumei_mylist?device=$deviceId";
 
-    log(url);
     final response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -301,13 +292,10 @@ class _MyHomePageState extends State<MyHomePage> {
         fromNameList = json.decode(response.body)["from_name_list"];
         toNameList = json.decode(response.body)["to_name_list"];
         memoList = json.decode(response.body)["memo_list"];
-
+        dobList = json.decode(response.body)["dob_list"];
       });
-      // certificateList = json.decode(response.body)["person_list"];
-
       return certificateList;
     } else {
-      log("else");
       throw Exception('Failed to load article');
     }
   }
@@ -315,40 +303,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
-    // streamController.stream.listen((addData) {
-    //   log(addData);
-    // });
-    // log("init end");
-    // streamController.sink.add("DIO");
-    // streamController.sink.add("承太郎");
     fetchArticle();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // List<dynamic> jsonArray = [];
-
-    // fetchArticle() async {
-    //   log("async");
-    //
-    //   final url = 'https://qiita.com/api/v2/items';
-    //   final response = await http.get(url);
-    //   if (response.statusCode == 200) {
-    //     jsonArray = json.decode(response.body);
-    //     // log(json.decode(response.body));
-    //     log("api");
-    //     log(jsonArray.length.toString());
-    //
-    //     return jsonArray;
-    //   } else {
-    //     log("else");
-    //     throw Exception('Failed to load article');
-    //   }
-    // }
-
-    return new Scaffold(
+   return new Scaffold(
       appBar: new AppBar(
         title: new Text("古参証明書　一覧"),
       ),
@@ -356,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage> {
         log("a");
         return InkWell(
           onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateDetail(index, fromNameList[index], toNameList[index], memoList[index])));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateDetail(index, deviceId, fromNameList[index], toNameList[index], dobList[index], memoList[index])));
           },
           child: Card(
             child: Column(
@@ -365,9 +325,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: EdgeInsets.all(10.0),
                     child: ListTile(
                       title: Text(certificateList[index]),
-                      // leading: Image.asset("assets/image_sample.png"),
                       leading: Icon(Icons.people),
-                      subtitle: Text("2018年9月26日発行"),
+                      subtitle: Text(dobList[index] + "発行"),
                     )
                 )
               ],
@@ -392,21 +351,23 @@ class MyCertificateDetail extends StatefulWidget {
   @override
   _MyCertificateDetailState createState() => new _MyCertificateDetailState();
 
-  MyCertificateDetail(int id, String fromName, String toName, String memo) {
+  MyCertificateDetail(int id, String deviceId, String fromName, String toName, String dob, String memo) {
     _MyCertificateDetailState.i = id;
+    _MyCertificateDetailState.deviceId = deviceId;
     _MyCertificateDetailState.fromName = fromName;
     _MyCertificateDetailState.toName = toName;
+    _MyCertificateDetailState.dob = dob;
     _MyCertificateDetailState.memo = memo;
-
   }
 }
 
 class _MyCertificateDetailState extends State<MyCertificateDetail> {
   static int i = 0;
+  static String deviceId = "";
   static String fromName = "";
   static String toName = "";
+  static String dob = "";
   static String memo = "";
-
 
   @override
   Widget build(BuildContext context) {
@@ -415,7 +376,7 @@ class _MyCertificateDetailState extends State<MyCertificateDetail> {
           title: new Text("古参証明書"),
         ),
         body: Center(
-          child: Text("古参証明書　10月10日発行 \n\n $fromNameは$toNameを応援していることをここに証明します。\n\n「$memo」"),
+          child: Text("古参証明書　$fromName様　発効日 $dob \n\n $deviceIdは$toNameを応援していることをここに証明します。\n\n「$memo」"),
         )
     );
   }
@@ -449,7 +410,6 @@ class MyCertificateCreate extends StatefulWidget {
     _MyCertificateCreateState.user = user;
     _MyCertificateCreateState.token = token;
     _MyCertificateCreateState.secret = secret;
-
     _MyCertificateCreateState._deviceId = user.providerData[1].uid;
     _MyCertificateCreateState._fromName = user.providerData[1].displayName;
   }
@@ -514,7 +474,6 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
     print(res.statusCode);
     print(res.body);
 
-    // Convert the string response into something more useable
     var resJson = json.decode(res.body);
 
     return(resJson["id_str"]);
@@ -533,25 +492,21 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
             Text("相手の名前"),
             new TextField(
               enabled: true,
-              // 入力数
               maxLength: 10,
               maxLengthEnforced: false,
               style: TextStyle(color: Colors.red),
               obscureText: false,
               maxLines: 1,
-              //パスワード
               onChanged: _handleToName,
             ),
             Text("メモ"),
             new TextField(
               enabled: true,
-              // 入力数
               maxLength: 10,
               maxLengthEnforced: false,
               style: TextStyle(color: Colors.red),
               obscureText: false,
               maxLines: 1,
-              //パスワード
               onChanged: _handleMemo,
             ),
             RaisedButton(
@@ -562,11 +517,8 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
               ),
               onPressed: () {
                 Future createCertificate() async {
-
                   _toName = await twitterUserShow(token, secret, _toName);
-
                   final url = "https://eca9kh6oqe.execute-api.ap-northeast-1.amazonaws.com/default/kosan_syoumei_create?device=$_deviceId&from_name=$_fromName&to_name=$_toName&memo=$_memo";
-
                   await http.get(url);
                 }
                 createCertificate();
