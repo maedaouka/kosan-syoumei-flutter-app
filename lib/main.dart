@@ -201,7 +201,6 @@ class _AuthPageState extends State {
     //Firebaseのuser id取得
     final FirebaseUser user =
         (await _auth.signInWithCredential(credential)).user;
-    print(user);
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
@@ -215,13 +214,12 @@ class _AuthPageState extends State {
   void signOutTwitter() async {
     await twitterLogin.logOut();
     logout();
-    print("User Sign Out Twittter");
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget logoutText = Text("ログアウト中");
-    Widget loginText = Text("ログイン中");
+    Widget logoutText = Text("現在ログアウト状態です");
+    Widget loginText = Text("現在ログイン状態です");
 
     Widget loginBtnTwitter = RaisedButton(
       child: Text("Sign in with Twitter"),
@@ -300,14 +298,10 @@ class _MyHomePageState extends State<MyHomePage> {
         toNameList = json.decode(response.body)["to_name_list"];
         memoList = json.decode(response.body)["memo_list"];
         dobList = json.decode(response.body)["dob_list"];
-        print("user");
-        print(user);
         if(Platform.isAndroid) {
-          print("あんどろいど");
           deviceId = user.providerData[1].uid;
         }
         if(Platform.isIOS) {
-          print("IOS");
           deviceId = user.providerData[0].uid;
         }
 
@@ -331,7 +325,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text("古参証明書　一覧"),
       ),
       body: ListView(children: List.generate(certificateList.length, (index) {
-        log("a");
         return InkWell(
           onTap: (){
             Navigator.push(context, MaterialPageRoute(builder: (context) => MyCertificateDetail(index, deviceId, fromNameList[index], toNameList[index], dobList[index], memoList[index])));
@@ -468,8 +461,6 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
 
   Future twitterUserShow(String token, String secret, String screen_name) async {
 
-    print(screen_name);
-
     String consumerApiKey = "IoJiMkAVEmjjkQoIExzAn69xE";
     String consumerApiSecret = "ZCa3waPjr9HM5xHDgSDcLjiGqy6jBeQ6DlVyAa5uOkDG09bLOU";
     String accessToken = token;
@@ -494,9 +485,6 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
     );
 
     var res = await twitterRequest;
-
-    print(res.statusCode);
-    print(res.body);
 
     var resJson = json.decode(res.body);
 
