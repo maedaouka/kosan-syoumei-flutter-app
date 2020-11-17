@@ -500,8 +500,7 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
       body: Center(
         child: Column(
           children: <Widget>[
-            Text("古参証明書作成ページ"),
-            Text("相手の名前"),
+            Text("相手のTwitterID（@は入力しないでください）"),
             new TextField(
               enabled: true,
               maxLength: 10,
