@@ -1,16 +1,26 @@
 # kosan_syoumei
 
-A new Flutter application.
+twitterのユーザーUIDとAWSのQLDBを利用した、古参であることを証明するアプリです。
+自分がいつから誰を応援しているのだと証明するための証明書を発行します。
 
-## Getting Started
+## 構成
 
-This project is a starting point for a Flutter application.
+firebaseを利用してtwitter認証でログイン
 
-A few resources to get you started if this is your first Flutter project:
+　　　　　↓
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+ログイン時に取得した情報からtwitterAPIを叩く。（応援相手を入力する際にAPIを叩いてユーザー情報を取得しています。）
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+　　　　　↓
+
+AWSのAPIGateway　→　AWSのlambda →　QLDBアクセス
+
+
+## 構成
+flutterAppのインストール
+https://flutter.dev/docs/get-started/install
+
+パッケージがプロジェクトに取り込む
+```
+flutter pub get
+```
