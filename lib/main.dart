@@ -117,6 +117,7 @@
 // }
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
@@ -126,7 +127,14 @@ import 'dart:developer';
 import 'dart:async';
 import 'package:twitter_api/twitter_api.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.dumpErrorToConsole(details);
+  if (kReleaseMode)
+    exit(1);
+};
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -262,14 +270,13 @@ class _MyHomePageState extends State<MyHomePage> {
   static FirebaseUser user;
   static String token;
   static String secret;
+  static String deviceId;
   static List<dynamic> certificateList = [];
   static List<dynamic> fromNameList = [];
   static List<dynamic> toNameList = [];
   static List<dynamic> memoList = [];
   static List<dynamic> dobList = [];
 
-
-  var deviceId = user.providerData[1].uid;
 
   List<String> itemList = [];
   void buildItemList()async{
@@ -293,6 +300,17 @@ class _MyHomePageState extends State<MyHomePage> {
         toNameList = json.decode(response.body)["to_name_list"];
         memoList = json.decode(response.body)["memo_list"];
         dobList = json.decode(response.body)["dob_list"];
+        print("user");
+        print(user);
+        if(Platform.isAndroid) {
+          print("あんどろいど");
+          deviceId = user.providerData[1].uid;
+        }
+        if(Platform.isIOS) {
+          print("IOS");
+          deviceId = user.providerData[0].uid;
+        }
+
       });
       return certificateList;
     } else {
@@ -376,7 +394,7 @@ class _MyCertificateDetailState extends State<MyCertificateDetail> {
           title: new Text("古参証明書"),
         ),
         body: Center(
-          child: Text("古参証明書　$fromName様　発効日 $dob \n\n $deviceIdは$toNameを応援していることをここに証明します。\n\n「$memo」"),
+          child: Text("古参証明書　$fromName様　発効日 $dob \n\n $deviceIdは$toNameを応援していることをここに証明します。\n\n「$memo」\n\n 古参証明書"),
         )
     );
   }
@@ -410,8 +428,14 @@ class MyCertificateCreate extends StatefulWidget {
     _MyCertificateCreateState.user = user;
     _MyCertificateCreateState.token = token;
     _MyCertificateCreateState.secret = secret;
-    _MyCertificateCreateState._deviceId = user.providerData[1].uid;
-    _MyCertificateCreateState._fromName = user.providerData[1].displayName;
+    if (Platform.isAndroid) {
+      _MyCertificateCreateState._deviceId = user.providerData[1].uid;
+      _MyCertificateCreateState._fromName = user.providerData[1].displayName;
+    } else if (Platform.isIOS) {
+      _MyCertificateCreateState._deviceId = user.providerData[0].uid;
+      _MyCertificateCreateState._fromName = user.providerData[0].displayName;
+    }
+
   }
 }
 
