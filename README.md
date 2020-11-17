@@ -16,7 +16,15 @@ firebaseを利用してtwitter認証でログイン
 AWSのAPIGateway　→　AWSのlambda →　QLDBアクセス
 
 
-## 構成
+lambda のコード
+
+作成
+https://github.com/maedaouka/lambda_kosan_syoumei_create
+
+一覧取得
+https://github.com/maedaouka/lambda_kosan_syoumei_mylist
+
+## 環境構築
 flutterAppのインストール
 https://flutter.dev/docs/get-started/install
 
