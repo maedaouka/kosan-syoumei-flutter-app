@@ -3,6 +3,8 @@
 twitterのユーザーUIDとAWSのQLDBを利用した、古参であることを証明するアプリです。
 自分がいつから誰を応援しているのだと証明するための証明書を発行します。
 
+![kosan](https://user-images.githubusercontent.com/29334692/99350486-dae31580-28e1-11eb-8857-18c8a80da589.gif)
+
 ## 構成
 
 firebaseを利用してtwitter認証でログイン
