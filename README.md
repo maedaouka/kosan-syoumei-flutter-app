@@ -34,3 +34,10 @@ https://flutter.dev/docs/get-started/install
 ```
 flutter pub get
 ```
+
+
+iosのエミュレーターを起動する場合は、以下も実行。
+```
+cd ios
+pod install
+```
