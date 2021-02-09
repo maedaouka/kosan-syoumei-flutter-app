@@ -176,12 +176,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
+      final body = json.decode(response.body)
       setState(() {
-        certificateList = json.decode(response.body)["to_name_list"];
-        fromNameList = json.decode(response.body)["from_name_list"];
-        toNameList = json.decode(response.body)["to_name_list"];
-        memoList = json.decode(response.body)["memo_list"];
-        dobList = json.decode(response.body)["dob_list"];
+        certificateList = body["to_name_list"];
+        fromNameList = body["from_name_list"];
+        toNameList = body["to_name_list"];
+        memoList = body["memo_list"];
+        dobList = body["dob_list"];
         if(Platform.isAndroid) {
           deviceId = user.providerData[1].uid;
         }
