@@ -244,26 +244,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 class MyCertificateDetail extends StatefulWidget {
+  final int id;
+  final String deviceId;
+  final String fromName;
+  final String toName;
+  final String dob;
+  final static String memo;
   @override
   _MyCertificateDetailState createState() => new _MyCertificateDetailState();
 
   MyCertificateDetail(int id, String deviceId, String fromName, String toName, String dob, String memo) {
-    _MyCertificateDetailState.i = id;
-    _MyCertificateDetailState.deviceId = deviceId;
-    _MyCertificateDetailState.fromName = fromName;
-    _MyCertificateDetailState.toName = toName;
-    _MyCertificateDetailState.dob = dob;
-    _MyCertificateDetailState.memo = memo;
+    this.id = id;
+    this.deviceId = deviceId;
+    this.fromName = fromName;
+    this.toName = toName;
+    this.dob = dob;
+    this.memo = memo;
   }
 }
 
 class _MyCertificateDetailState extends State<MyCertificateDetail> {
-  static int i = 0;
-  static String deviceId = "";
-  static String fromName = "";
-  static String toName = "";
-  static String dob = "";
-  static String memo = "";
+  int i = 0;
+  String deviceId = "";
+  String fromName = "";
+  String toName = "";
+  String dob = "";
+  String memo = "";
 
   @override
   Widget build(BuildContext context) {
