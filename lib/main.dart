@@ -10,6 +10,7 @@ import 'dart:developer';
 import 'dart:async';
 import 'package:twitter_api/twitter_api.dart';
 
+
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
   FlutterError.dumpErrorToConsole(details);
@@ -51,7 +52,7 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final TwitterLogin twitterLogin = TwitterLogin(
+  final twitterLogin  = TwitterLogin(
     consumerKey: "IoJiMkAVEmjjkQoIExzAn69xE",
     consumerSecret: "ZCa3waPjr9HM5xHDgSDcLjiGqy6jBeQ6DlVyAa5uOkDG09bLOU",
   );
