@@ -176,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      final body = json.decode(response.body)
+      final body = json.decode(response.body);
       setState(() {
         certificateList = body["to_name_list"];
         fromNameList = body["from_name_list"];
@@ -249,18 +249,11 @@ class MyCertificateDetail extends StatefulWidget {
   final String fromName;
   final String toName;
   final String dob;
-  final static String memo;
+  final String memo;
   @override
   _MyCertificateDetailState createState() => new _MyCertificateDetailState();
 
-  MyCertificateDetail(int id, String deviceId, String fromName, String toName, String dob, String memo) {
-    this.id = id;
-    this.deviceId = deviceId;
-    this.fromName = fromName;
-    this.toName = toName;
-    this.dob = dob;
-    this.memo = memo;
-  }
+  MyCertificateDetail(this.id, this.deviceId, this.fromName, this.toName, this.dob, this.memo);
 }
 
 class _MyCertificateDetailState extends State<MyCertificateDetail> {
