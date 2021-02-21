@@ -100,23 +100,31 @@ class _AuthPageState extends State {
     logout();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget logoutText = Text("現在ログアウト状態です");
-    Widget loginText = Text("現在ログイン状態です");
+  Widget loginBtnTwitter;
+  Widget logoutBtnTwitter;
 
-    Widget loginBtnTwitter = RaisedButton(
+  @override
+  void initState() {
+    super.initState();
+
+    loginBtnTwitter = RaisedButton(
       child: Text("Sign in with Twitter"),
       color: Color(0xFF1DA1F2),
       textColor: Colors.white,
       onPressed: signInWithTwitter,
     );
-    Widget logoutBtnTwitter = RaisedButton(
+    logoutBtnTwitter = RaisedButton(
       child: Text("Sign out with Twitter"),
       color: Color(0xFF1DA1F2),
       textColor: Colors.white,
       onPressed: signOutTwitter,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget logoutText = Text("現在ログアウト状態です");
+    Widget loginText = Text("現在ログイン状態です");
 
     return Scaffold(
       appBar: AppBar(
