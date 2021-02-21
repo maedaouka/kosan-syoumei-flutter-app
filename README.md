@@ -17,6 +17,8 @@ firebaseを利用してtwitter認証でログイン
 
 AWSのAPIGateway　→　AWSのlambda →　QLDBアクセス
 
+![Untitled Diagram](https://user-images.githubusercontent.com/29334692/108146172-132c0700-7110-11eb-875a-d2a770cc3031.jpg)
+
 
 lambda のコード
 
