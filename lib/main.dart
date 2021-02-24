@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:developer';
 import 'dart:async';
 import 'package:twitter_api/twitter_api.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 void main() {
@@ -426,6 +427,7 @@ class _MyCertificateCreateState extends State<MyCertificateCreate> {
                 }
                 createCertificate();
                 Navigator.of(context).pop();
+                Fluttertoast.showToast(msg: "送信完了しました");
               },
             ),
           ],
