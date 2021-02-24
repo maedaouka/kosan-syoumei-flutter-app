@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "263337993940",
+    "firebase_url": "https://kosan-syoumei.firebaseio.com",
+    "project_id": "kosan-syoumei",
+    "storage_bucket": "kosan-syoumei.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263337993940:android:a477112044438109edfd41",
+        "android_client_info": {
+          "package_name": "com.example.kosan_syoumei"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "263337993940-1qv94jle9nrg5d8asn2si8olnqlu1quj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCG3eRcJ449imx3hvXiT6dGR2Xih8-zOj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "263337993940-1qv94jle9nrg5d8asn2si8olnqlu1quj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "263337993940-75jrs4pq9csdum71g25sfb78fpbfanqo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
